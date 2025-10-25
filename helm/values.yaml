@@ -1,4 +1,5 @@
 image:
-  repository: azeshion21/demo-app
+  repository: kibojago/demo-app
   tag: latest
 replicaCount: 1
+
