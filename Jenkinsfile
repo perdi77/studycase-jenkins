@@ -51,12 +51,12 @@ pipeline {
 
     stage('Deploy to Kubernetes (Helm)') {
       steps {
-        withCredentials([file(credentialsId: "${KUBECONFIG_CRED}", variable: 'KUBE_FILE')]) {
+        withCredentials([file(credentialsId: "${KUBECONFIG_CRED}", variable: 'KUBECONFIG')]) {
           script {
-            echo "🚀 Deploying to Kubernetes using Helm..."
+            echo "🚀 Deploying to Kubernetes..."
             sh """
-              export KUBECONFIG=$KUBE_FILE
-              helm upgrade --install ${HELM_RELEASE} ./helm \
+              helm upgrade --install ${HELM_RELEASE} ./helm-chart \
+                --kubeconfig $KUBECONFIG \
                 --set image.repository=${IMAGE} \
                 --set image.tag=${TAG} \
                 --namespace ${NAMESPACE} --create-namespace
