@@ -15,7 +15,7 @@ pipeline {
     stage('Checkout Source Code') {
       steps {
         echo "📦 Checking out source code..."
-        git url: 'https://github.com/perdi77/studycase-jenkins.git', branch: 'main'
+        git branch: 'main', url: 'https://github.com/perdi77/studycase-jenkins.git'
       }
     }
 
@@ -23,9 +23,9 @@ pipeline {
       steps {
         script {
           echo "🛠️ Building Docker image ${IMAGE}:${TAG}..."
-          sh """
-            docker build -t ${IMAGE}:${TAG} .
-          """
+          sh '''
+            docker build -t $IMAGE:$TAG .
+          '''
         }
       }
     }
@@ -39,11 +39,11 @@ pipeline {
         )]) {
           script {
             echo "📤 Pushing image to Docker Hub..."
-            sh """
+            sh '''
               echo "$PASS" | docker login -u "$USER" --password-stdin
-              docker push ${IMAGE}:${TAG}
+              docker push $IMAGE:$TAG
               docker logout
-            """
+            '''
           }
         }
       }
@@ -54,13 +54,13 @@ pipeline {
         withCredentials([file(credentialsId: "${KUBECONFIG_CRED}", variable: 'KUBECONFIG')]) {
           script {
             echo "🚀 Deploying to Kubernetes..."
-            sh """
-              helm upgrade --install ${HELM_RELEASE} ./helm-chart \
+            sh '''
+              helm upgrade --install $HELM_RELEASE ./helm-chart \
                 --kubeconfig $KUBECONFIG \
-                --set image.repository=${IMAGE} \
-                --set image.tag=${TAG} \
-                --namespace ${NAMESPACE} --create-namespace
-            """
+                --set image.repository=$IMAGE \
+                --set image.tag=$TAG \
+                --namespace $NAMESPACE --create-namespace
+            '''
           }
         }
       }
